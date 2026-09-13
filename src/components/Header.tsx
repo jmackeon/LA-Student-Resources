@@ -21,20 +21,18 @@ export function Header({ stageName }: HeaderProps) {
     <header className="site-header">
       <div className="site-header__inner">
         <div className="site-header__brand">
-          <span className="site-header__logo-badge">
-            {logoFailed ? (
-              <span className="site-header__logo-fallback" aria-hidden="true">
-                <GraduationCap size={22} strokeWidth={2} />
-              </span>
-            ) : (
-              <img
-                src="/LAC_logo.png"
-                alt="London Academy logo"
-                className="site-header__logo"
-                onError={() => setLogoFailed(true)}
-              />
-            )}
-          </span>
+          {logoFailed ? (
+            <span className="site-header__logo-fallback" aria-hidden="true">
+              <GraduationCap size={26} strokeWidth={2} />
+            </span>
+          ) : (
+            <img
+              src="/LAC_logo.png"
+              alt="London Academy logo"
+              className="site-header__logo"
+              onError={() => setLogoFailed(true)}
+            />
+          )}
           <span className="site-header__title">London Academy</span>
         </div>
 

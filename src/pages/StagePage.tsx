@@ -109,7 +109,7 @@ export function StagePage({ stage }: StagePageProps) {
 
       <footer className="app__footer">
         <p>London Academy • Student Resources</p>
-        <p className="app__footer-year">© {new Date().getFullYear()}</p>
+        <p className="app__footer-year">• © {new Date().getFullYear()}</p>
       </footer>
     </div>
   );
