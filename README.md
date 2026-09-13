@@ -15,7 +15,7 @@ selector:
 | -------------------- | -------------------------------------- | ------------------------------------------- |
 | `/`                   | Root — stage picker (teachers/testing) | `London Academy \| Student Resources`        |
 | `/primary`            | Primary students                       | `London Academy \| Primary Resources`        |
-| `/secondary/nc`       | Lower Secondary / National Curriculum  | `London Academy \| Secondary NC Resources`   |
+| `/secondary/nc`       | Secondary students                     | `London Academy \| Secondary Resources`      |
 | `/secondary/igcse`    | IGCSE students                         | `London Academy \| IGCSE Resources`          |
 
 All three stage routes render the same reusable components — there are no
@@ -28,9 +28,12 @@ The complete **resource directory** (all 56 resources under all 8 categories)
 is identical on every stage route — see "The directory is not filtered by
 stage" below.
 
-`/` is mainly useful for teachers, testing, and unmanaged devices. Knox
-device groups should be assigned directly to `/primary`, `/secondary/nc`, or
-`/secondary/igcse` — see "Knox homepage assignments" below.
+`/` is a **stage picker on first visit only**. Once a student picks a stage
+there, or opens a stage route directly, that choice is remembered on that
+tablet's Chrome profile and `/` will silently redirect straight to it on
+every later visit — see "Remembering a student's stage" below. Every managed
+tablet can therefore be configured with the same single homepage URL:
+`https://students.elitelac.com/`.
 
 ## Install dependencies
 
@@ -77,6 +80,43 @@ Every stage route is a simple two-level experience:
 
 Search is intentionally not part of this version — see "Search (reserved for
 a later phase)" below.
+
+## Remembering a student's stage
+
+All stage/route logic lives in one place:
+[`src/utils/stagePreference.ts`](src/utils/stagePreference.ts).
+
+- Visiting `/` reads the stage preference from `localStorage`
+  (key `lac-student-stage-v1`). If it holds a valid stage, `/` redirects
+  straight to that stage's route using history **replacement**
+  (`navigate(path, { replace: true })`), so the redirect doesn't leave an
+  extra entry in browser history — pressing Back on a stage page goes to
+  whatever was open before `/`, not into a `/` → stage → `/` loop. The
+  chooser is never painted first; the redirect decision is made before the
+  first render, so there's no flash of the chooser before it happens.
+- If nothing is saved, `/` shows **Choose Your Learning Stage** as before.
+- If the saved value isn't one of the three known stages, only that invalid
+  entry is removed and the chooser is shown — the rest of `localStorage` is
+  left untouched.
+- **Picking a stage card** and **visiting a stage route directly** (e.g. a
+  Knox homepage temporarily pointed at `/secondary/nc`, or a bookmark) both
+  save that stage as the new preference — so a direct link becomes the
+  tablet's remembered stage too. Both cases are handled by one effect in
+  `StagePage`, not duplicated per entry point.
+- Every `localStorage` read/write is wrapped in `try/catch`. If storage is
+  blocked (private browsing, a locked-down profile, storage quota, etc.) the
+  site keeps working — `/` just shows the chooser every visit instead of
+  remembering a choice, and picking a stage still navigates normally.
+- No cookies, accounts, authentication, or analytics are involved — this is
+  a same-device convenience only, never a security or identity mechanism.
+
+### Change Stage
+
+Every stage page's header has a small **Change Stage** button next to the
+stage name (top right). It removes the saved preference and sends the
+student to `/`, which — since the preference is now gone — shows the
+chooser immediately rather than redirecting back to the stage they just
+left.
 
 ## Managing resources
 
@@ -192,21 +232,15 @@ are intentionally deferred to a later phase of this project.
 The header logo, browser favicon, and app icon all use one file:
 
 ```text
-public/brand/london-academy-logo.png
+public/LAC_logo.png
 ```
 
-Add the real logo at that path (create the `brand` folder if it doesn't exist
-yet) — nothing else needs to change. Until it's added:
-
-- the header gracefully falls back to a green graduation-cap mark instead of
-  a broken image;
-- the browser tab falls back to the placeholder favicon at
-  [`public/favicon.svg`](public/favicon.svg) (`index.html` declares the real
-  logo as the primary `<link rel="icon">` and the placeholder SVG as a
-  fallback, so browsers pick up whichever one currently resolves).
+Replace that file to change the logo — nothing else needs to change. If it's
+ever missing, the header gracefully falls back to a green graduation-cap mark
+instead of a broken image.
 
 Don't stretch, recolor, or distort the logo — the header sizes it to roughly
-46px tall via `object-fit: contain`.
+58px tall via `object-fit: contain`, preserving its original aspect ratio.
 
 ## Theming
 
@@ -243,23 +277,35 @@ are required — this is a fully static site.
 3. Wait for DNS propagation — Vercel will mark the domain "Valid" once the
    record is detected, and will automatically issue an SSL certificate.
 
-## Knox homepage assignments
+## Knox homepage assignment
 
-Once deployed, assign each Knox device group's browser homepage to the route
-matching its learning stage — these are different presentations of the same
-deployed application, not separate sites:
+Only **one** Chrome managed configuration is needed, for every school and
+every learning stage:
 
 ```text
-Primary device groups:
-https://students.elitelac.com/primary
-
-Lower Secondary / NC device groups:
-https://students.elitelac.com/secondary/nc
-
-IGCSE device groups:
-https://students.elitelac.com/secondary/igcse
+https://students.elitelac.com/
 ```
 
-The root `https://students.elitelac.com/` (the learning-stage picker) is not
-intended for managed devices — it's there for teachers, testing, and
-unmanaged devices to reach any stage manually.
+Assign this as the managed Chrome homepage for all device groups — Primary,
+Lower Secondary/NC, and IGCSE alike. There's no need for separate Knox
+configurations per stage:
+
+1. On a tablet's first visit, the student sees **Choose Your Learning Stage**
+   and picks theirs once.
+2. That choice is saved in `localStorage` in that Chrome profile, on that
+   tablet.
+3. Every later visit to `/` — including the tablet's own homepage reopening —
+   goes straight to the right stage automatically.
+4. If Chrome data is cleared, the device is factory-reset, or a different
+   Chrome profile is used, the saved choice is gone and the student sees the
+   chooser again on the next visit to `/`.
+5. If a student ends up on the wrong stage, they can use the **Change Stage**
+   button in the header at any time to clear the saved choice and pick again
+   — no need to clear Chrome data or reset the device.
+
+A stage route (e.g. `https://students.elitelac.com/secondary/nc`) still works
+if assigned directly instead — visiting it saves that stage as the
+preference too, so it becomes the tablet's remembered stage from then on,
+including future visits to `/`. This is useful for temporary per-device-group
+Knox assignments during rollout, but is no longer required once every device
+is pointed at the single root URL above.

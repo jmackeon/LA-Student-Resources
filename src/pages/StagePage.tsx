@@ -5,6 +5,7 @@ import { ResourceDirectory } from "../components/ResourceDirectory";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { CATEGORIES, getResourcesBySlugs, resources, type ResourceCategory } from "../data/resources";
 import type { StageConfig } from "../data/stages";
+import { saveStage } from "../utils/stagePreference";
 
 const visibleResources = resources.filter((resource) => !resource.hidden);
 
@@ -16,6 +17,12 @@ interface StagePageProps {
 
 export function StagePage({ stage }: StagePageProps) {
   useDocumentTitle(stage.browserTitle);
+
+  // Whether this page was reached by picking a stage or visiting its URL directly
+  // (e.g. a Knox homepage assignment), it becomes the tablet's remembered stage.
+  useEffect(() => {
+    saveStage(stage.id);
+  }, [stage.id]);
 
   const [viewMode, setViewMode] = useState<ViewMode>("quick-access");
   const [expandedCategory, setExpandedCategory] = useState<ResourceCategory | null>(null);

@@ -19,11 +19,11 @@ export interface CategoryMeta {
 /** Icon and accent colour (CSS variable) shown on category cards and resource tiles. */
 export const CATEGORY_META: Record<ResourceCategory, CategoryMeta> = {
   "School Platforms": { icon: School, colorVar: "--color-navy" },
-  "Reading & English": { icon: BookOpen, colorVar: "--color-emerald" },
+  "Reading & English": { icon: BookOpen, colorVar: "--color-primary" },
   Mathematics: { icon: Calculator, colorVar: "--color-gold" },
   "Coding & Technology": { icon: Code2, colorVar: "--color-navy" },
-  "Creative Tools": { icon: Palette, colorVar: "--color-emerald" },
+  "Creative Tools": { icon: Palette, colorVar: "--color-primary" },
   Assessments: { icon: ClipboardCheck, colorVar: "--color-gold" },
   "Games & Activities": { icon: Gamepad2, colorVar: "--color-navy" },
-  "Research & Reference": { icon: Library, colorVar: "--color-emerald" },
+  "Research & Reference": { icon: Library, colorVar: "--color-primary" },
 };

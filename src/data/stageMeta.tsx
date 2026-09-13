@@ -9,6 +9,6 @@ export interface StageMeta {
 
 export const STAGE_META: Record<LearningStage, StageMeta> = {
   primary: { icon: BookOpen, selectorLabel: "Primary" },
-  "secondary-nc": { icon: School, selectorLabel: "Secondary — National Curriculum" },
+  "secondary-nc": { icon: School, selectorLabel: "Secondary" },
   "secondary-igcse": { icon: GraduationCap, selectorLabel: "IGCSE" },
 };
