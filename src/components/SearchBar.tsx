@@ -10,14 +10,19 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
     <div className="search-bar">
       <Search className="search-bar__icon" size={20} aria-hidden="true" />
       <input
-        type="text"
+        type="search"
         className="search-bar__input"
-        placeholder="Search learning resources…"
-        aria-label="Search learning resources"
+        placeholder="Search approved resources…"
+        aria-label="Search approved learning resources"
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") onChange("");
+        }}
         autoComplete="off"
         spellCheck={false}
+        inputMode="search"
+        enterKeyHint="search"
       />
       {value.length > 0 && (
         <button

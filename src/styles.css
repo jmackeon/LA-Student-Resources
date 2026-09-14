@@ -190,18 +190,25 @@ button {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* Search (currently unused — reserved for a later phase) */
+/* Search */
 
 .search-bar {
   position: relative;
   display: flex;
   align-items: center;
+  width: min(780px, 100%);
+  margin: 0 auto 20px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 0 14px;
-  height: 52px;
-  max-width: 640px;
+  padding: 0 16px;
+  height: 56px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-bar:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
 }
 
 .search-bar__icon {
@@ -211,6 +218,7 @@ button {
 
 .search-bar__input {
   flex: 1;
+  min-width: 0;
   border: none;
   outline: none;
   background: transparent;
@@ -218,6 +226,14 @@ button {
   color: var(--color-text);
   padding: 0 10px;
   height: 100%;
+}
+
+/* Hide native search-input decorations so our own icon/clear button are the only ones shown */
+.search-bar__input::-webkit-search-decoration,
+.search-bar__input::-webkit-search-cancel-button,
+.search-bar__input::-webkit-search-results-button,
+.search-bar__input::-webkit-search-results-decoration {
+  display: none;
 }
 
 .search-bar__input::placeholder {
@@ -228,8 +244,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   border: none;
   background: transparent;
   color: var(--color-text-muted);
@@ -241,6 +257,25 @@ button {
 .search-bar__clear:hover {
   background: var(--color-hover);
   color: var(--color-text);
+}
+
+/* Search results */
+
+.search-results__header {
+  margin-bottom: 16px;
+}
+
+.search-results__heading {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.search-results__count {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
 }
 
 /* Page intro (left-aligned heading treatment for the directory view) */
@@ -904,6 +939,23 @@ button {
 .empty-state__hint {
   margin: 0;
   font-size: 0.95rem;
+}
+
+.empty-state__action {
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.empty-state__action:hover {
+  background: rgba(var(--color-primary-rgb), 0.08);
 }
 
 /* Footer */

@@ -3,11 +3,10 @@ import { Header } from "../components/Header";
 import { QuickAccessView } from "../components/QuickAccessView";
 import { ResourceDirectory } from "../components/ResourceDirectory";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { CATEGORIES, getResourcesBySlugs, resources, type ResourceCategory } from "../data/resources";
+import { CATEGORIES, getResourcesBySlugs, visibleResources, type ResourceCategory } from "../data/resources";
 import type { StageConfig } from "../data/stages";
 import { saveStage } from "../utils/stagePreference";
-
-const visibleResources = resources.filter((resource) => !resource.hidden);
+import { searchResources } from "../utils/searchResources";
 
 type ViewMode = "quick-access" | "directory";
 
@@ -26,6 +25,7 @@ export function StagePage({ stage }: StagePageProps) {
 
   const [viewMode, setViewMode] = useState<ViewMode>("quick-access");
   const [expandedCategory, setExpandedCategory] = useState<ResourceCategory | null>(null);
+  const [query, setQuery] = useState("");
 
   const isFirstRender = useRef(true);
   const quickAccessHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -64,18 +64,22 @@ export function StagePage({ stage }: StagePageProps) {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [expandedCategory]);
 
+  const searchResults = useMemo(() => searchResources(query), [query]);
+
   function handleSelectCategory(category: ResourceCategory) {
     setExpandedCategory((prev) => (prev === category ? null : category));
   }
 
   function handleViewAll() {
     setExpandedCategory(null);
+    setQuery("");
     setViewMode("directory");
   }
 
   function handleBack() {
     setViewMode("quick-access");
     setExpandedCategory(null);
+    setQuery("");
   }
 
   return (
@@ -90,6 +94,9 @@ export function StagePage({ stage }: StagePageProps) {
             subtitle={stage.subtitle}
             resources={quickAccessResources}
             totalCount={visibleResources.length}
+            query={query}
+            onQueryChange={setQuery}
+            searchResults={searchResults}
             onViewAll={handleViewAll}
           />
         ) : (
@@ -103,6 +110,9 @@ export function StagePage({ stage }: StagePageProps) {
             onCloseCategory={() => setExpandedCategory(null)}
             onBack={handleBack}
             backLabel={stage.backLabel}
+            query={query}
+            onQueryChange={setQuery}
+            searchResults={searchResults}
           />
         )}
       </main>

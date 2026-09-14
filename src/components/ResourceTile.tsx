@@ -6,9 +6,11 @@ import { getHostname } from "../utils/hostname";
 
 interface ResourceTileProps {
   resource: Resource;
+  /** Appends the resource's category after its hostname — useful in flat, mixed-category listings like search results. */
+  showCategory?: boolean;
 }
 
-export function ResourceTile({ resource }: ResourceTileProps) {
+export function ResourceTile({ resource, showCategory }: ResourceTileProps) {
   const meta = CATEGORY_META[resource.category];
   const Icon = meta.icon;
   const [failedIcon, setFailedIcon] = useState<string>();
@@ -37,7 +39,10 @@ export function ResourceTile({ resource }: ResourceTileProps) {
       </span>
       <span className="resource-tile__text">
         <span className="resource-tile__name">{resource.name}</span>
-        <span className="resource-tile__host">{getHostname(resource.url)}</span>
+        <span className="resource-tile__host">
+          {getHostname(resource.url)}
+          {showCategory ? ` • ${resource.category}` : ""}
+        </span>
       </span>
       <ArrowUpRight className="resource-tile__launch" size={16} strokeWidth={2.25} aria-hidden="true" />
     </a>

@@ -1,6 +1,8 @@
 import type { RefObject } from "react";
 import { ArrowLeft } from "lucide-react";
 import type { Resource, ResourceCategory } from "../data/resources";
+import { SearchBar } from "./SearchBar";
+import { SearchResults } from "./SearchResults";
 import { CategoryGrid } from "./CategoryGrid";
 import { CategoryPanel } from "./CategoryPanel";
 
@@ -14,6 +16,9 @@ interface ResourceDirectoryProps {
   onCloseCategory: () => void;
   onBack: () => void;
   backLabel: string;
+  query: string;
+  onQueryChange: (value: string) => void;
+  searchResults: Resource[];
 }
 
 export function ResourceDirectory({
@@ -26,7 +31,12 @@ export function ResourceDirectory({
   onCloseCategory,
   onBack,
   backLabel,
+  query,
+  onQueryChange,
+  searchResults,
 }: ResourceDirectoryProps) {
+  const isSearching = query.trim().length > 0;
+
   return (
     <div className="resource-directory">
       <div className="directory-header">
@@ -42,19 +52,27 @@ export function ResourceDirectory({
         </button>
       </div>
 
-      <CategoryGrid
-        categories={categories}
-        counts={counts}
-        activeCategory={expandedCategory}
-        onSelect={onSelectCategory}
-      />
+      <SearchBar value={query} onChange={onQueryChange} />
 
-      {expandedCategory && (
-        <CategoryPanel
-          category={expandedCategory}
-          resources={expandedCategoryResources}
-          onClose={onCloseCategory}
-        />
+      {isSearching ? (
+        <SearchResults results={searchResults} onClear={() => onQueryChange("")} />
+      ) : (
+        <>
+          <CategoryGrid
+            categories={categories}
+            counts={counts}
+            activeCategory={expandedCategory}
+            onSelect={onSelectCategory}
+          />
+
+          {expandedCategory && (
+            <CategoryPanel
+              category={expandedCategory}
+              resources={expandedCategoryResources}
+              onClose={onCloseCategory}
+            />
+          )}
+        </>
       )}
     </div>
   );

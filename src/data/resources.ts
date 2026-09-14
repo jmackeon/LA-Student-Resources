@@ -107,6 +107,9 @@ export const resources: Resource[] = [
   { slug: "the-national-academy", name: "The National Academy", url: "https://www.thenational.academy/", category: "Research & Reference", icon: "/app-logos/oak-national-academy.png" },
 ];
 
+/** Every resource students can actually see — the source of truth for counts, search, and category listings. */
+export const visibleResources: Resource[] = resources.filter((resource) => !resource.hidden);
+
 const resourceBySlug = new Map(resources.map((resource) => [resource.slug, resource]));
 
 /**

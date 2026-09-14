@@ -1,5 +1,7 @@
 import type { RefObject } from "react";
 import type { Resource } from "../data/resources";
+import { SearchBar } from "./SearchBar";
+import { SearchResults } from "./SearchResults";
 import { QuickAccessGrid } from "./QuickAccessGrid";
 import { ViewAllResourcesCard } from "./ViewAllResourcesCard";
 
@@ -9,6 +11,9 @@ interface QuickAccessViewProps {
   subtitle: string;
   resources: Resource[];
   totalCount: number;
+  query: string;
+  onQueryChange: (value: string) => void;
+  searchResults: Resource[];
   onViewAll: () => void;
 }
 
@@ -18,8 +23,13 @@ export function QuickAccessView({
   subtitle,
   resources,
   totalCount,
+  query,
+  onQueryChange,
+  searchResults,
   onViewAll,
 }: QuickAccessViewProps) {
+  const isSearching = query.trim().length > 0;
+
   return (
     <div className="quick-access-view">
       <div className="stage-intro">
@@ -29,9 +39,16 @@ export function QuickAccessView({
         <p className="stage-intro__subtitle">{subtitle}</p>
       </div>
 
-      <QuickAccessGrid resources={resources} />
+      <SearchBar value={query} onChange={onQueryChange} />
 
-      <ViewAllResourcesCard totalCount={totalCount} onSelect={onViewAll} />
+      {isSearching ? (
+        <SearchResults results={searchResults} onClear={() => onQueryChange("")} />
+      ) : (
+        <>
+          <QuickAccessGrid resources={resources} />
+          <ViewAllResourcesCard totalCount={totalCount} onSelect={onViewAll} />
+        </>
+      )}
     </div>
   );
 }
