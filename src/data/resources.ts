@@ -1,3 +1,5 @@
+import { QUEST_CAMPUSES, QUEST_LOGO } from "./questCampuses";
+
 export type ResourceCategory =
   | "School Platforms"
   | "Reading & English"
@@ -90,7 +92,15 @@ export const resources: Resource[] = [
 
   // Assessments
   { slug: "wayground", name: "Wayground", url: "https://wayground.com/", category: "Assessments", icon: "/app-logos/wayground.webp" },
-  { slug: "quest-assessments", name: "Quest Assessments", url: "https://app.questassessments.com/public/lacas/", category: "Assessments", icon: "/app-logos/quest-assessments.jpg" },
+  ...QUEST_CAMPUSES.map(
+    (campus): Resource => ({
+      slug: `quest-assessments-${campus.id}`,
+      name: `Quest Assessments — ${campus.name}`,
+      url: campus.url,
+      category: "Assessments",
+      icon: QUEST_LOGO,
+    }),
+  ),
   { slug: "save-my-exams", name: "Save My Exams", url: "https://www.savemyexams.com/", category: "Assessments", icon: "/app-logos/save-my-exams.webp" },
   { slug: "oxford-aqa", name: "Oxford AQA", url: "https://www.oxfordaqa.com/", category: "Assessments", icon: "/app-logos/oxford-aqa.png" },
 
@@ -112,17 +122,20 @@ export const visibleResources: Resource[] = resources.filter((resource) => !reso
 
 const resourceBySlug = new Map(resources.map((resource) => [resource.slug, resource]));
 
+/** Looks up one resource by its stable `slug`. Throws if the slug doesn't exist — a fast, loud signal for a typo. */
+export function getResourceBySlug(slug: string): Resource {
+  const resource = resourceBySlug.get(slug);
+  if (!resource) {
+    throw new Error(`Unknown resource slug: "${slug}"`);
+  }
+  return resource;
+}
+
 /**
- * Looks up resources by their stable `slug`, in the given order. Used by stage
- * configs to build a Quick Access list from the shared resource data without
- * duplicating names, URLs, or categories.
+ * Looks up resources by their stable `slug`, in the given order. Used to build
+ * a Quick Access list from the shared resource data without duplicating
+ * names, URLs, or categories.
  */
 export function getResourcesBySlugs(slugs: readonly string[]): Resource[] {
-  return slugs.map((slug) => {
-    const resource = resourceBySlug.get(slug);
-    if (!resource) {
-      throw new Error(`Unknown resource slug: "${slug}"`);
-    }
-    return resource;
-  });
+  return slugs.map(getResourceBySlug);
 }

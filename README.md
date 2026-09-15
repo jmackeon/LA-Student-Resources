@@ -24,7 +24,7 @@ per-stage forks of the page. Each stage differs only in:
 1. its centred heading/subtitle copy, and
 2. which 12 resources appear in its **Quick Access** grid.
 
-The complete **resource directory** (all 56 resources under all 8 categories)
+The complete **resource directory** (every resource, under all 8 categories)
 is identical on every stage route — see "The directory is not filtered by
 stage" below.
 
@@ -71,15 +71,16 @@ Every stage route is a simple two-level experience:
    platform icons for that stage, arranged 6×2 on tablet-landscape and
    desktop widths, plus a **View All Resources** control below them.
 2. Selecting **View All Resources** switches (in place, no page reload) to
-   the **resource directory**: eight category cards covering all 56
-   resources. Selecting a category expands a full-width panel underneath
-   with that category's resource tiles, sorted alphabetically; selecting it
-   again (or "Close category") collapses it. Only one category can be
-   expanded at a time. The stage-aware **Back to \_\_\_ Resources** button
-   returns to that stage's Quick Access.
+   the **resource directory**: eight category cards covering every resource.
+   Selecting a category expands a full-width panel underneath with that
+   category's resource tiles, sorted alphabetically; selecting it again (or
+   "Close category") collapses it. Only one category can be expanded at a
+   time. The stage-aware **Back to \_\_\_ Resources** button returns to that
+   stage's Quick Access.
 
-Search is intentionally not part of this version — see "Search (reserved for
-a later phase)" below.
+A search bar appears on both the Quick Access view and the directory (see
+"Search" below) — typing replaces whichever grid is showing with a flat,
+matching results view; clearing it restores exactly what was showing before.
 
 ## Remembering a student's stage
 
@@ -161,7 +162,8 @@ since the raw `url` string is used as the link's `href`.
 ### The directory is not filtered by stage
 
 This is deliberate: every stage route's **View All Resources** directory
-shows the same complete set of 56 resources under the same 8 categories.
+shows the same complete set of resources (58 at last count — always derived
+from `resources.ts`, never hard-coded) under the same 8 categories.
 There is no "primary"/"NC"/"IGCSE" tag on resource records, and none is
 planned for the directory — only the 12 Quick Access icons change between
 stages. If age/grade-appropriate directory filtering is wanted later, that's
@@ -203,29 +205,75 @@ quickAccessResourceIds: [
 Each resource has an optional `icon` field for a locally stored image:
 
 ```ts
-{ slug: "canva", name: "Canva", url: "https://www.canva.com/", category: "Creative Tools", icon: "/resource-icons/canva.png" }
+{ slug: "canva", name: "Canva", url: "https://www.canva.com/", category: "Creative Tools", icon: "/app-logos/canva.png" }
 ```
 
 Conventionally, name the file after the resource's `slug` and drop it under
-[`public/resource-icons/`](public/resource-icons/) (create the folder if it
-doesn't exist yet). Reference it with a `/`-rooted path. Quick Access cards:
+[`public/app-logos/`](public/app-logos/). Reference it with a `/`-rooted
+path. Resource tiles and Quick Access cards:
 
 - use `object-fit: contain` so logos are never cropped or stretched, with
   padding around them inside the card;
-- fall back to the resource's **name as plain text** if `icon` is omitted or
-  the image fails to load — never a broken-image icon;
+- fall back to the resource's **name as plain text** (Quick Access) or the
+  category icon (directory tiles) if `icon` is omitted or the image fails to
+  load — never a broken-image icon;
 - never fetch icons from the internet, hotlink them, or call an external
   favicon service.
 
 If a resource appears in more than one stage's Quick Access, it uses the same
-`icon` everywhere — set it once on the resource, not per stage.
+`icon` everywhere — set it once on the resource, not per stage. If a source
+image has a lot of baked-in transparent padding and renders too small, add
+`iconScale` (a multiplier >1) to that resource rather than re-exporting the
+image.
 
-### Search (reserved for a later phase)
+### Quest Assessments campuses
 
-A search bar component exists at
-[`src/components/SearchBar.tsx`](src/components/SearchBar.tsx) but is not
-currently imported or rendered anywhere — search and "safe research" tooling
-are intentionally deferred to a later phase of this project.
+Quest Assessments is one login portal per campus, not one resource:
+
+```text
+Casablanca:   https://app.questassessments.com/public/lacas/
+Dar Bouazza:  https://app.questassessments.com/public/ladb/
+Rabat:        https://app.questassessments.com/public/larabat
+```
+
+The three URLs live in exactly one place —
+[`src/data/questCampuses.ts`](src/data/questCampuses.ts) — and everything
+else derives from it:
+
+- **The directory** gets three real, separate resource records
+  (`Quest Assessments — Casablanca`, `— Dar Bouazza`, `— Rabat`), built by
+  mapping over `QUEST_CAMPUSES` in `resources.ts`. They behave like any other
+  resource: searchable by name/category/hostname, and clicking one opens that
+  campus's URL directly — no picker involved.
+- **Quick Access** can't feature three tiles for one login system without
+  breaking the fixed 12-card layout, so it instead features a single
+  **Quest Assessments** launcher. Selecting it opens a `<dialog>` campus
+  chooser (`src/components/QuestCampusDialog.tsx`); selecting a campus there
+  opens that campus's URL. The chooser never remembers the last campus
+  chosen — these are shared tablets, so it asks every time.
+- A stage's `quickAccessResourceIds` (in `stages.ts`) references the launcher
+  via the `QUEST_PICKER_ID` sentinel instead of a resource slug;
+  `getQuickAccessItems` (in `src/data/quickAccessItems.ts`) expands that
+  sentinel into the launcher and every other id into its resource, producing
+  a typed `QuickAccessItem[]` (`{ kind: "resource" }` or
+  `{ kind: "quest-campus-picker" }`). The launcher is a UI-only construct —
+  it is never added to `resources.ts` and never counts toward the directory
+  total.
+
+**To update a campus URL:** edit its `url` in `QUEST_CAMPUSES` — the
+directory record and the dialog button both pick it up automatically.
+**To add or remove a campus:** add or remove an entry in `QUEST_CAMPUSES`;
+nothing else needs to change.
+
+### Search
+
+The search bar (`src/components/SearchBar.tsx`) is wired into the Quick
+Access view and the directory. It filters `visibleResources` in memory —
+name, hostname, and category, case-insensitive and accent-tolerant — via
+[`src/utils/searchResources.ts`](src/utils/searchResources.ts). There's no
+backend, external index, or network request involved; typing simply swaps
+whichever grid is showing for a flat, alphabetically sorted results grid,
+and clearing the query restores the previous view.
 
 ## School logo and favicon
 

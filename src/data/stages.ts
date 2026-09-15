@@ -1,3 +1,5 @@
+import { QUEST_PICKER_ID } from "./questCampuses";
+
 export type LearningStage = "primary" | "secondary-nc" | "secondary-igcse";
 
 export interface StageConfig {
@@ -34,7 +36,7 @@ export const STAGES: Record<LearningStage, StageConfig> = {
       "white-rose-education",
       "topmarks",
       "phonics-play",
-      "quest-assessments",
+      QUEST_PICKER_ID,
       "scratch",
       "code-org-studio",
       "britannica-kids",
@@ -54,7 +56,7 @@ export const STAGES: Record<LearningStage, StageConfig> = {
       "century",
       "canva",
       "sensations-english",
-      "quest-assessments",
+      QUEST_PICKER_ID,
       "dr-frost",
       "the-national-academy",
       "scratch",
@@ -79,7 +81,7 @@ export const STAGES: Record<LearningStage, StageConfig> = {
       "dr-frost",
       "save-my-exams",
       "oxford-aqa",
-      "quest-assessments",
+      QUEST_PICKER_ID,
       "the-national-academy",
       "sensations-english",
       "online-python",

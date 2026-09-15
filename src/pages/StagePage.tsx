@@ -3,7 +3,8 @@ import { Header } from "../components/Header";
 import { QuickAccessView } from "../components/QuickAccessView";
 import { ResourceDirectory } from "../components/ResourceDirectory";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { CATEGORIES, getResourcesBySlugs, visibleResources, type ResourceCategory } from "../data/resources";
+import { CATEGORIES, visibleResources, type ResourceCategory } from "../data/resources";
+import { getQuickAccessItems } from "../data/quickAccessItems";
 import type { StageConfig } from "../data/stages";
 import { saveStage } from "../utils/stagePreference";
 import { searchResources } from "../utils/searchResources";
@@ -43,8 +44,8 @@ export function StagePage({ stage }: StagePageProps) {
     }
   }, [viewMode]);
 
-  const quickAccessResources = useMemo(
-    () => getResourcesBySlugs(stage.quickAccessResourceIds),
+  const quickAccessItems = useMemo(
+    () => getQuickAccessItems(stage.quickAccessResourceIds),
     [stage.quickAccessResourceIds],
   );
 
@@ -92,7 +93,7 @@ export function StagePage({ stage }: StagePageProps) {
             headingRef={quickAccessHeadingRef}
             pageTitle={stage.pageTitle}
             subtitle={stage.subtitle}
-            resources={quickAccessResources}
+            items={quickAccessItems}
             totalCount={visibleResources.length}
             query={query}
             onQueryChange={setQuery}

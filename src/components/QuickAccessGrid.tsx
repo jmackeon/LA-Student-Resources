@@ -1,16 +1,19 @@
-import type { Resource } from "../data/resources";
+import type { RefObject } from "react";
+import type { QuickAccessItem } from "../data/quickAccessItems";
 import { QuickAccessCard } from "./QuickAccessCard";
 
 interface QuickAccessGridProps {
-  resources: Resource[];
+  items: QuickAccessItem[];
+  onOpenQuestPicker: (trigger: HTMLButtonElement) => void;
+  questTriggerRef: RefObject<HTMLButtonElement | null>;
 }
 
-export function QuickAccessGrid({ resources }: QuickAccessGridProps) {
+export function QuickAccessGrid({ items, onOpenQuestPicker, questTriggerRef }: QuickAccessGridProps) {
   return (
     <ul className="quick-access-grid">
-      {resources.map((resource) => (
-        <li key={resource.url}>
-          <QuickAccessCard resource={resource} />
+      {items.map((item) => (
+        <li key={item.kind === "resource" ? item.resource.url : "quest-campus-picker"}>
+          <QuickAccessCard item={item} onOpenQuestPicker={onOpenQuestPicker} questTriggerRef={questTriggerRef} />
         </li>
       ))}
     </ul>

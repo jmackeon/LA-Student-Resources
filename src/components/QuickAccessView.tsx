@@ -1,15 +1,17 @@
-import type { RefObject } from "react";
+import { useRef, useState, type RefObject } from "react";
 import type { Resource } from "../data/resources";
+import type { QuickAccessItem } from "../data/quickAccessItems";
 import { SearchBar } from "./SearchBar";
 import { SearchResults } from "./SearchResults";
 import { QuickAccessGrid } from "./QuickAccessGrid";
 import { ViewAllResourcesCard } from "./ViewAllResourcesCard";
+import { QuestCampusDialog } from "./QuestCampusDialog";
 
 interface QuickAccessViewProps {
   headingRef: RefObject<HTMLHeadingElement | null>;
   pageTitle: string;
   subtitle: string;
-  resources: Resource[];
+  items: QuickAccessItem[];
   totalCount: number;
   query: string;
   onQueryChange: (value: string) => void;
@@ -21,7 +23,7 @@ export function QuickAccessView({
   headingRef,
   pageTitle,
   subtitle,
-  resources,
+  items,
   totalCount,
   query,
   onQueryChange,
@@ -29,6 +31,14 @@ export function QuickAccessView({
   onViewAll,
 }: QuickAccessViewProps) {
   const isSearching = query.trim().length > 0;
+  const [isQuestDialogOpen, setQuestDialogOpen] = useState(false);
+  const questTriggerRef = useRef<HTMLButtonElement>(null);
+
+  function handleCloseQuestDialog() {
+    setQuestDialogOpen(false);
+    // Native <dialog> already restores focus to the trigger; this is a defensive fallback.
+    questTriggerRef.current?.focus();
+  }
 
   return (
     <div className="quick-access-view">
@@ -45,10 +55,16 @@ export function QuickAccessView({
         <SearchResults results={searchResults} onClear={() => onQueryChange("")} />
       ) : (
         <>
-          <QuickAccessGrid resources={resources} />
+          <QuickAccessGrid
+            items={items}
+            onOpenQuestPicker={() => setQuestDialogOpen(true)}
+            questTriggerRef={questTriggerRef}
+          />
           <ViewAllResourcesCard totalCount={totalCount} onSelect={onViewAll} />
         </>
       )}
+
+      <QuestCampusDialog open={isQuestDialogOpen} onClose={handleCloseQuestDialog} />
     </div>
   );
 }
