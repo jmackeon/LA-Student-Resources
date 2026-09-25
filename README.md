@@ -159,6 +159,17 @@ stage configs point at it.
 All URLs must use `https://`. URL fragments (e.g. `#animate`) are preserved
 since the raw `url` string is used as the link's `href`.
 
+A resource added to `resources.ts` is automatically visible in the full
+directory and in search on every stage — nothing else needs touching for
+that. It only shows up in a stage's **Quick Access** grid if its slug is
+also added to that stage's `quickAccessResourceIds` (see below), which is a
+deliberate second step, not automatic. For example, **Multiplication Tables
+Check** (Mathematics), **ELI Digital Hub**, and **Spy Readers** (both
+Reading & English) are directory/search-only resources: they have no local
+icon (none was supplied, so they fall back to their category icon) and were
+never added to any stage's Quick Access list, so the existing 12-card grids
+are unchanged.
+
 ### The directory is not filtered by stage
 
 This is deliberate: every stage route's **View All Resources** directory

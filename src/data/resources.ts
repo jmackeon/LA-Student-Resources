@@ -57,11 +57,14 @@ export const resources: Resource[] = [
   { slug: "games-to-learn-english", name: "Games to Learn English", url: "https://www.gamestolearnenglish.com/", category: "Reading & English" },
   { slug: "oxford-owl", name: "Oxford Owl", url: "https://www.oxfordowl.co.uk/", category: "Reading & English" },
   { slug: "red-cat-reading", name: "Red Cat Reading", url: "https://www.redcatreading.com/", category: "Reading & English" },
+  { slug: "eli-digital-hub", name: "ELI Digital Hub", url: "https://elidigitalhub.elionline.com/", category: "Reading & English" },
+  { slug: "spy-readers", name: "Spy Readers", url: "https://spyreaders.co.uk/", category: "Reading & English" },
 
   // Mathematics
   { slug: "polypad", name: "Polypad", url: "https://polypad.amplify.com/p", category: "Mathematics" },
   { slug: "topmarks", name: "Topmarks", url: "https://www.topmarks.co.uk/", category: "Mathematics", icon: "/app-logos/topmarks.png" },
   { slug: "mathsframe", name: "Mathsframe", url: "https://mathsframe.co.uk/", category: "Mathematics" },
+  { slug: "multiplication-tables-check", name: "Multiplication Tables Check", url: "https://mathsframe.co.uk/en/resources/resource/477/Multiplication-Tables-Check", category: "Mathematics" },
   { slug: "prodigy-game", name: "Prodigy Game", url: "https://play.prodigygame.com/", category: "Mathematics" },
   { slug: "turtle-diary", name: "Turtle Diary", url: "https://www.turtlediary.com/", category: "Mathematics" },
   { slug: "math-is-fun", name: "Math is Fun", url: "https://www.mathsisfun.com/", category: "Mathematics" },
