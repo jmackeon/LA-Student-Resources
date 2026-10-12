@@ -1,4 +1,5 @@
 import { QUEST_CAMPUSES, QUEST_LOGO } from "./questCampuses";
+import type { LearningStage } from "./stages";
 
 export type ResourceCategory =
   | "School Platforms"
@@ -21,6 +22,8 @@ export interface Resource {
   icon?: string;
   /** Multiplier (>1) on the logo's max render size, for source files with a lot of baked-in transparent padding. Rarely needed. */
   iconScale?: number;
+  /** Learning stages this resource is offered on. Omit to make it available on every stage. */
+  stages?: readonly LearningStage[];
 }
 
 /** Category display order used for the category cards and grouped resource listings. */
@@ -41,7 +44,6 @@ export const resources: Resource[] = [
   { slug: "toddle-tablet", name: "Toddle (Tablet)", url: "https://web.toddleapp.com/", category: "School Platforms", icon: "/app-logos/toddle.png" },
   { slug: "google-sign-in", name: "Google Sign-in", url: "https://accounts.google.com/", category: "School Platforms" },
   { slug: "century", name: "Century", url: "https://app.century.tech/login/", category: "School Platforms", icon: "/app-logos/century.png", iconScale: 1.3 },
-  { slug: "clickview", name: "ClickView", url: "https://saml-in3.clickview.co.uk/Shibboleth.sso/LONDON/", category: "School Platforms" },
   { slug: "lac-tech-club", name: "LAC Tech Club", url: "https://club-platform-xsfl.vercel.app/", category: "School Platforms" },
 
   // Reading & English
@@ -80,7 +82,7 @@ export const resources: Resource[] = [
   { slug: "teachable-machine", name: "Teachable Machine", url: "https://teachablemachine.withgoogle.com/", category: "Coding & Technology" },
   { slug: "wordpress", name: "WordPress", url: "https://wordpress.com/", category: "Coding & Technology" },
   { slug: "machine-learning-for-kids", name: "Machine Learning for Kids", url: "https://machinelearningforkids.co.uk/", category: "Coding & Technology" },
-  { slug: "scratch", name: "Scratch", url: "https://scratch.mit.edu/", category: "Coding & Technology", icon: "/app-logos/scratch.jpg" },
+  { slug: "scratch", name: "Scratch", url: "https://scratch.mit.edu/", category: "Coding & Technology", icon: "/app-logos/scratch.jpg", stages: ["primary"] },
   { slug: "typingclub", name: "TypingClub", url: "https://www.typingclub.com/", category: "Coding & Technology" },
   { slug: "monkeytype", name: "Monkeytype", url: "https://monkeytype.com/", category: "Coding & Technology" },
   { slug: "code-org-studio", name: "Code.org Studio", url: "https://studio.code.org/", category: "Coding & Technology", icon: "/app-logos/code-org-studio.png" },
@@ -88,7 +90,6 @@ export const resources: Resource[] = [
 
   // Creative Tools
   { slug: "canva", name: "Canva", url: "https://www.canva.com/", category: "Creative Tools", icon: "/app-logos/canva.png" },
-  { slug: "padlet", name: "Padlet", url: "https://padlet.com/", category: "Creative Tools", icon: "/app-logos/padlet.jpg" },
   { slug: "design-arena", name: "Design Arena", url: "https://www.designarena.ai/", category: "Creative Tools" },
   { slug: "google-drawing", name: "Google Drawing", url: "https://docs.google.com/drawings/", category: "Creative Tools" },
   { slug: "j2e-animate", name: "J2e Animate", url: "https://www.j2e.com/jit5#animate/", category: "Creative Tools" },
@@ -117,11 +118,30 @@ export const resources: Resource[] = [
   { slug: "kiddle", name: "Kiddle", url: "https://www.kiddle.co/", category: "Research & Reference" },
   { slug: "britannica-kids", name: "Britannica Kids", url: "https://kids.britannica.com/", category: "Research & Reference", icon: "/app-logos/britannica-kids.png" },
   { slug: "wikipedia", name: "Wikipedia", url: "https://www.wikipedia.org/", category: "Research & Reference" },
-  { slug: "the-national-academy", name: "The National Academy", url: "https://www.thenational.academy/", category: "Research & Reference", icon: "/app-logos/oak-national-academy.png" },
 ];
 
-/** Every resource students can actually see — the source of truth for counts, search, and category listings. */
+/** Every non-hidden resource across all stages. Use `getStageResources` for anything shown on a stage page. */
 export const visibleResources: Resource[] = resources.filter((resource) => !resource.hidden);
+
+/** Whether a resource is offered on the given stage. Resources without `stages` are available everywhere. */
+export function isAvailableForStage(resource: Resource, stage: LearningStage): boolean {
+  return !resource.stages || resource.stages.includes(stage);
+}
+
+const visibleResourcesByStage = new Map<LearningStage, Resource[]>();
+
+/**
+ * Every resource students on the given stage can see — the source of truth for
+ * that stage's directory, category counts, totals, and search results.
+ */
+export function getStageResources(stage: LearningStage): Resource[] {
+  let stageResources = visibleResourcesByStage.get(stage);
+  if (!stageResources) {
+    stageResources = visibleResources.filter((resource) => isAvailableForStage(resource, stage));
+    visibleResourcesByStage.set(stage, stageResources);
+  }
+  return stageResources;
+}
 
 const resourceBySlug = new Map(resources.map((resource) => [resource.slug, resource]));
 

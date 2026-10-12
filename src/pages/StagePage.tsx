@@ -3,7 +3,7 @@ import { Header } from "../components/Header";
 import { QuickAccessView } from "../components/QuickAccessView";
 import { ResourceDirectory } from "../components/ResourceDirectory";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { CATEGORIES, visibleResources, type ResourceCategory } from "../data/resources";
+import { CATEGORIES, getStageResources, type ResourceCategory } from "../data/resources";
 import { getQuickAccessItems } from "../data/quickAccessItems";
 import type { StageConfig } from "../data/stages";
 import { saveStage } from "../utils/stagePreference";
@@ -44,28 +44,31 @@ export function StagePage({ stage }: StagePageProps) {
     }
   }, [viewMode]);
 
+  // Every list, count, and search below is scoped to the active stage's resources.
+  const stageResources = getStageResources(stage.id);
+
   const quickAccessItems = useMemo(
-    () => getQuickAccessItems(stage.quickAccessResourceIds),
-    [stage.quickAccessResourceIds],
+    () => getQuickAccessItems(stage.quickAccessResourceIds, stage.id),
+    [stage.quickAccessResourceIds, stage.id],
   );
 
   const categoryCounts = useMemo(() => {
     const counts = new Map<ResourceCategory, number>();
     for (const category of CATEGORIES) counts.set(category, 0);
-    for (const resource of visibleResources) {
+    for (const resource of stageResources) {
       counts.set(resource.category, (counts.get(resource.category) ?? 0) + 1);
     }
     return counts;
-  }, []);
+  }, [stageResources]);
 
   const expandedCategoryResources = useMemo(() => {
     if (!expandedCategory) return [];
-    return visibleResources
+    return stageResources
       .filter((resource) => resource.category === expandedCategory)
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [expandedCategory]);
+  }, [expandedCategory, stageResources]);
 
-  const searchResults = useMemo(() => searchResources(query), [query]);
+  const searchResults = useMemo(() => searchResources(query, stage.id), [query, stage.id]);
 
   function handleSelectCategory(category: ResourceCategory) {
     setExpandedCategory((prev) => (prev === category ? null : category));
@@ -94,7 +97,7 @@ export function StagePage({ stage }: StagePageProps) {
             pageTitle={stage.pageTitle}
             subtitle={stage.subtitle}
             items={quickAccessItems}
-            totalCount={visibleResources.length}
+            totalCount={stageResources.length}
             query={query}
             onQueryChange={setQuery}
             searchResults={searchResults}

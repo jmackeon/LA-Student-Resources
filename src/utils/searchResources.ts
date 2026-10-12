@@ -1,4 +1,5 @@
-import { visibleResources, type Resource } from "../data/resources";
+import { getStageResources, type Resource } from "../data/resources";
+import type { LearningStage } from "../data/stages";
 import { getHostname } from "./hostname";
 
 // Unicode "Combining Diacritical Marks" block (0x0300–0x036F). Stripping these
@@ -17,15 +18,16 @@ function normalize(value: string): string {
 }
 
 /**
- * Searches all approved (visible) resources by name, hostname, and category.
+ * Searches the approved resources available on the given stage by name,
+ * hostname, and category.
  * Local, in-memory, case-insensitive, and accent-tolerant — never touches the
  * network. Returns an empty array for a blank query.
  */
-export function searchResources(query: string): Resource[] {
+export function searchResources(query: string, stage: LearningStage): Resource[] {
   const normalizedQuery = normalize(query);
   if (!normalizedQuery) return [];
 
-  return visibleResources
+  return getStageResources(stage)
     .filter((resource) => {
       const haystack = normalize([resource.name, getHostname(resource.url), resource.category].join(" "));
       return haystack.includes(normalizedQuery);
