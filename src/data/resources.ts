@@ -107,6 +107,8 @@ export const resources: Resource[] = [
   ),
   { slug: "save-my-exams", name: "Save My Exams", url: "https://www.savemyexams.com/", category: "Assessments", icon: "/app-logos/save-my-exams.webp" },
   { slug: "oxford-aqa", name: "Oxford AQA", url: "https://www.oxfordaqa.com/", category: "Assessments", icon: "/app-logos/oxford-aqa.png" },
+  // Shared by every stage and campus. No local logo yet — add `icon: "/app-logos/isi-surveys.png"` once one exists.
+  { slug: "isi-surveys", name: "ISI Surveys", url: "https://surveys.isi.net/", category: "Assessments" },
 
   // Games & Activities
   { slug: "ict-games", name: "ICT Games", url: "https://ictgames.com/", category: "Games & Activities" },
