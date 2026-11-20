@@ -41,6 +41,7 @@ export const STAGES: Record<LearningStage, StageConfig> = {
       "code-org-studio",
       "britannica-kids",
       "wayground",
+      "coding-academy",
     ],
   },
   "secondary-nc": {
@@ -63,6 +64,7 @@ export const STAGES: Record<LearningStage, StageConfig> = {
       "online-python",
       "britannica-kids",
       "wayground",
+      "coding-academy",
     ],
   },
   "secondary-igcse": {

@@ -87,6 +87,8 @@ export const resources: Resource[] = [
   { slug: "monkeytype", name: "Monkeytype", url: "https://monkeytype.com/", category: "Coding & Technology" },
   { slug: "code-org-studio", name: "Code.org Studio", url: "https://studio.code.org/", category: "Coding & Technology", icon: "/app-logos/code-org-studio.png" },
   { slug: "online-python", name: "Online Python", url: "https://www.online-python.com/", category: "Coding & Technology", icon: "/app-logos/online-python.png" },
+  // No local logo yet — add `icon: "/app-logos/coding-academy.png"` once one exists.
+  { slug: "coding-academy", name: "Coding Academy", url: "https://codingacademy.ma/app", category: "Coding & Technology", stages: ["primary", "secondary-nc"] },
 
   // Creative Tools
   { slug: "canva", name: "Canva", url: "https://www.canva.com/", category: "Creative Tools", icon: "/app-logos/canva.png" },
